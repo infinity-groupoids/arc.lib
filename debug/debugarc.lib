@@ -1,0 +1,469 @@
+////////////////////////////////////////////////////////////////
+version="arc.lib 1.0.0.0 Jun_2025 "; 
+category="Algebraic geometry";
+// summary description of the library
+info="
+LIBRARY:   arc.lib  A Template for a Singular Library
+AUTHOR:    Andrew Stout, email: astout@bmcc.cuny.edu
+
+SEE ALSO:  standard_lib, Libraries,
+           Typesetting of help and info strings
+
+KEYWORDS: Jet schemes, arc.lib; Generalized jet schemes, arc.lib;
+
+PROCEDURES:
+  arc(ideal, ideal, ideal, list)        return list of equations of a generalized arc space relative to an embedded fat point
+  
+";
+////////////////////////////////////////////////////////////////////
+
+
+proc arc(ideal Vars, ideal I, ideal J, list optList)
+{
+    // Determine whether to use the optional skip list
+    int useOptList = 1;
+    if (size(optList) == 0)
+    {
+        useOptList = 0;
+    }
+    else
+    {
+        for (int k = 1; k <= size(optList); k++)
+        {
+            if (optList[k] < 1)
+            {
+                useOptList = 0;
+                break;
+            }
+        }
+    }
+    // Call arc_internal with explicit type conversion
+    int useOptList_int = int(useOptList);
+    arc_internal(Vars, I, J, optList, useOptList_int);
+}
+
+// Internal procedure without test functionality
+proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
+{
+    // Compute and store global count at start of arc_internal
+    int N = size(Vars);
+    int M = size(optList);
+
+    if (J == 0) { print("Error: The ideal J is the zero ideal. Terminating."); return; }
+
+    // Step 2: identify fat point variables
+    ideal fatVars = (0);
+    int flag1 = 0;
+    poly currentVar;
+    int jdx1;
+    for (int idx1 = 1; idx1 <= N; idx1++)
+    {
+    flag1 = 0;
+    currentVar = var(idx1);
+
+    for (jdx1 = 1; jdx1 <= size(J); jdx1++)
+    {
+            intvec w = 0:N;
+            w[idx1] = 1;
+            if (deg(J[jdx1], w) > 0)          //A stricter test is to use reduced
+            {
+                flag1 = 1; break;
+            }
+        }
+        if (flag1 == 1)
+        {
+            fatVars = fatVars + currentVar;
+        }
+    }
+    // Step 3: store strings
+    string T_vars = string(Vars[1]);
+    for (int idx2 = 2; idx2 <= N; idx2++) {
+        T_vars = T_vars + "," + string(Vars[idx2]);
+    }
+    string I_stored = string(I);
+
+    // Step 4: new ring F
+    if (size(fatVars) == 0) { print("Warning: fatVars empty."); return; }
+    string varsString = string(fatVars[1]);
+    for (int idx3 = 2; idx3 <= size(fatVars); idx3++) {
+        varsString = varsString + "," + string(fatVars[idx3]);
+    }
+    string J_str = string(J);
+    execute("ring F = 0, (" + varsString + "), dp;");
+    execute("setring F;");
+    execute("ideal J_F = " + J_str + ";");
+
+    // Step 6: standard basis
+    ideal G        = std(J_F);
+
+    // Step 7: use kbase
+    ideal basis_JF = kbase(G);
+    int len_JF     = size(basis_JF);
+    string G_str   = string(G);
+    string B_str   = string(basis_JF);
+
+    // Step 8: new ring T
+    int m = N * len_JF;
+    if (m <= 0) { print("Error: fat point length < 2."); return; }
+    for (int idx4 = 1; idx4 <= m; idx4++) {
+        T_vars = T_vars + ",a" + string(idx4);
+    }
+    execute("ring T = 0, (" + T_vars + "), dp;");
+    execute("setring T;");
+
+    
+    execute("ideal I_T    = " + I_stored  + ";");
+    execute("ideal tmpG_T  = " + G_str     + ";");
+    ideal G_T        = std(tmpG_T);
+    execute("list basis_JF_T = (" + B_str + ");");
+    if (basis_JF_T[len_JF] != 1)
+    {
+        print("Error: last basis_JF_T != 1."); return;
+    }
+
+    // Step 9 build arcs
+    list arcs;
+    poly expr;
+    int relIndex, global_idx, skip, temp, jdx2;
+    for (int idx5 = 1; idx5 <= N; idx5++)
+    {
+        expr = 0;
+        for (jdx2 = 1; jdx2 <= len_JF; jdx2++)
+        {
+            relIndex = (jdx2-1)*N + idx5;
+            skip = 0;
+            if (useOptList == 1)
+            {
+                for (temp = 1; temp <= size(optList); temp++)
+                {
+                    if (optList[temp] == relIndex)
+                    {
+                        skip = 1; break;
+                    }
+                }
+            }
+            if (skip == 0)
+            {
+                global_idx = N + relIndex;
+                expr = expr + var(global_idx)*basis_JF_T[len_JF - jdx2 + 1];
+            }
+        }
+        arcs = arcs + list(expr);
+    }
+
+    // Step 10: substitute arcs using map
+    string mapStr = "map substMap = T, (";
+    int idx6;
+    for (idx6 = 1; idx6 <= N; idx6++)
+    {
+        mapStr = mapStr + "(" + string(arcs[idx6]) + ")";
+        if (idx6 < N)
+        {
+            mapStr = mapStr + ",";
+        }
+    }
+    mapStr = mapStr + ");";
+    execute(mapStr);
+    ideal bigIdeal = substMap(I_T);
+
+    // Step 11: reduce
+    ideal reducedBigIdeal;
+    for (idx6 = 1; idx6 <= size(bigIdeal); idx6++)
+    {
+        reducedBigIdeal = reducedBigIdeal + reduce(bigIdeal[idx6], G_T);
+    }
+
+    // Step 12: extract coefficients
+    ideal finalIdeal = 0;
+    poly f, term, basisElement;
+    poly old_f, old_term;
+    matrix coefMatrix;
+    int basisIdx, i2, kdx8, v, varIdx, shouldKeep;
+    string varToFind, termStr;
+
+    // Declare ov once at procedure level, before it's used
+    int ov = 0;
+
+    // Set up debug file
+    string debugFile = "arc_debug.txt";
+    int dummy = system("sh","rm -f " + debugFile);
+    write(debugFile, "=== DEBUG FOR STEP 12: EXTRACT COEFFICIENTS ===");
+    write(debugFile, "N = " + string(N), append);
+    write(debugFile, "Size of reducedBigIdeal = " + string(size(reducedBigIdeal)), append);
+    write(debugFile, "Size of basis_JF_T = " + string(size(basis_JF_T)), append);
+    write(debugFile, "useOptList = " + string(useOptList), append);
+    if (useOptList == 1) {
+        write(debugFile, "optList = " + string(optList), append);
+    }
+    write(debugFile, "", append); // Empty line
+    write(debugFile, "--- Begin Processing Each Polynomial ---", append);
+
+    for (kdx8 = 1; kdx8 <= size(reducedBigIdeal); kdx8++)
+    {
+        f = reducedBigIdeal[kdx8];
+        write(debugFile, "", append); // Empty line
+        write(debugFile, "Polynomial #" + string(kdx8) + ": " + string(f), append);
+        
+        for (basisIdx = 1; basisIdx < size(basis_JF_T); basisIdx++)
+        {
+            basisElement = basis_JF_T[basisIdx];
+            write(debugFile, "  Basis element #" + string(basisIdx) + ": " + string(basisElement), append);
+            
+            coefMatrix = coef(f, basisElement);
+            write(debugFile, "  Matrix dimensions: " + string(nrows(coefMatrix)) + "x" + string(ncols(coefMatrix)), append);
+            
+            for (i2 = 1; i2 <= ncols(coefMatrix); i2++)
+            {
+                write(debugFile, "    Column " + string(i2) + ":", append);
+                write(debugFile, "      Row 1: " + string(coefMatrix[1,i2]), append);
+                if (nrows(coefMatrix) >= 2) {
+                    write(debugFile, "      Row 2: " + string(coefMatrix[2,i2]), append);
+                }
+                
+                if (reduce(coefMatrix[1,i2], basisElement) == 0)
+                {
+                    write(debugFile, "      Matches basis element!", append);
+                    
+                    if (nrows(coefMatrix) >= 2) {
+                        term = coefMatrix[2,i2];
+                    } else {
+                        term = coefMatrix[1,i2];
+                    }
+                    write(debugFile, "      Initial term: " + string(term), append);
+                    
+                    // Use the pre-declared ov variable
+                    for (ov = 1; ov <= N; ov++) {
+                        if (deg(term, ov) > 0) {
+                            old_term = term;
+                            // Extract all coefficients including constants
+                            coefMatrix = coeffs(term, var(ov));
+                            poly result = 0;
+                            // Process all columns in the matrix to capture every coefficient
+                            for (int i = 1; i <= ncols(coefMatrix); i++) {
+                                result = result + coefMatrix[2,i];
+                            }
+                            term = result;
+                            write(debugFile, "      After processing var(" + string(ov) + "): " + string(old_term) + " -> " + string(term), append);
+                        }
+                    }
+                    
+                    shouldKeep = 1;
+                    if (useOptList == 1)
+                    {
+                        for (v=1;v<=size(optList);v++)
+                        {
+                            varIdx = optList[v];
+                            varToFind = "a"+string(varIdx)+"*";
+                            termStr   = string(term)+"*";
+                            write(debugFile, "      Checking if " + varToFind + " in " + termStr, append);
+                            if (find(termStr,varToFind)!=0)
+                            {
+                                shouldKeep = 0;
+                                write(debugFile, "      Found match - will NOT keep", append);
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldKeep == 1)
+                    {
+                        write(debugFile, "      Adding term to finalIdeal: " + string(term), append);
+                        finalIdeal = finalIdeal + term;
+                    }
+                }
+            }
+            
+            for (i2=1; i2<=ncols(coefMatrix); i2++)
+            {
+                if (reduce(coefMatrix[1,i2], basis_JF_T[basisIdx])==0 && nrows(coefMatrix)>=2)
+                {
+                    old_f = f;
+                    f = f - coefMatrix[2,i2]*coefMatrix[1,i2];
+                    write(debugFile, "  Updated f by subtracting " + string(coefMatrix[2,i2]*coefMatrix[1,i2]), append);
+                    write(debugFile, "  New f value: " + string(f), append);
+                }
+            }
+        }
+        
+        if (f!=0 && f!=1)
+        {
+            write(debugFile, "  Processing remaining f: " + string(f), append);
+            
+            // Use the pre-declared ov variable again
+            for (ov = 1; ov <= N; ov++) {
+                if (deg(f, ov) > 0) {
+                    old_f = f;
+                    f = coef(f, var(ov))[2,1];
+                    write(debugFile, "  After processing var(" + string(ov) + "): " + string(old_f) + " -> " + string(f), append);
+                }
+            }
+            
+            shouldKeep = 1;
+            if (useOptList==1)
+            {
+                for (v=1; v<=size(optList); v++)
+                {
+                    varIdx = optList[v];
+                    if (varIdx <= 0) { continue; }  // Skip invalid indices
+                    
+                    varToFind = "a"+string(varIdx)+"*";
+                    termStr   = string(f)+"*";
+                    write(debugFile, "  Checking if " + varToFind + " in " + termStr, append);
+                    if (find(termStr,varToFind)!=0)
+                    {
+                        shouldKeep = 0;
+                        write(debugFile, "  Found match - will NOT keep", append);
+                        break;
+                    }
+                }
+            }
+            if (shouldKeep == 1)
+            {
+                write(debugFile, "  Adding to finalIdeal: " + string(f), append);
+                finalIdeal = finalIdeal + f;
+            }
+        }
+    }
+
+    write(debugFile, "", append); // Empty line
+    write(debugFile, "--- Cleanup Phase ---", append);
+    
+    // cleanup
+    poly ct;  // single declaration for cleanup loop
+    ideal simplifiedFinal = 0;
+    for (i2 = 1; i2 <= size(finalIdeal); i2++)
+    {
+        // assign without redeclaration
+        ct = finalIdeal[i2];
+        write(debugFile, "Cleanup entry #" + string(i2) + ": " + string(ct), append);
+        
+        shouldKeep = 1;
+        if (useOptList == 1)
+        {
+            for (v=1; v<=size(optList); v++)
+            {
+                varToFind = "a" + string(optList[v]) + "*";
+                termStr   = string(ct) + "*";
+                write(debugFile, "  Checking if " + varToFind + " in " + termStr, append);
+                if (find(termStr, varToFind) != 0)
+                {
+                    shouldKeep = 0;
+                    write(debugFile, "  Found match - will NOT keep", append);
+                    break;
+                }
+            }
+        }
+        
+        // Skip terms that contain any of the original variables (first N variables)
+        if (shouldKeep == 1)
+        {
+            string ctString = string(ct);
+            for (int varIdx = 1; varIdx <= N; varIdx++)
+            {
+                string originalVar = varstr(varIdx);
+                if (find(ctString, originalVar) != 0)
+                {
+                    shouldKeep = 0;
+                    write(debugFile, "  Contains original variable " + originalVar + " - will NOT keep", append);
+                    break;
+                }
+            }
+        }
+        
+        if (shouldKeep == 1)
+        {
+            write(debugFile, "  Adding to simplifiedFinal: " + string(ct), append);
+            simplifiedFinal = simplifiedFinal + ct;
+        }
+    }
+    finalIdeal = simplifiedFinal;
+    
+    write(debugFile, "", append); // Empty line
+    write(debugFile, "--- Final Results ---", append);
+    write(debugFile, "Final output size: " + string(size(finalIdeal)), append);
+    write(debugFile, "Final elements:", append);
+    for (i2 = 1; i2 <= size(finalIdeal); i2++) {
+        write(debugFile, "  " + string(i2) + ": " + string(finalIdeal[i2]), append);
+    }
+
+    // output
+    option(noredefine);  // Add option to suppress redefinition warnings
+    print("Post-Processed Final Output:");
+    print(finalIdeal);
+
+    // Write the original output file (with all variables)
+    string origOutFile = "arc_original_output.txt";
+    int dummy1 = system("sh","rm -f " + origOutFile);
+    write(origOutFile, "ring S_full = 0, (" + T_vars + "), dp;");
+    write(origOutFile, "ideal A = " + string(finalIdeal) + ";", append);
+    
+    // Create filtered variable list with effective variables used in final ideal
+    string filtered_vars = "";
+    
+    // First collect all variables from N+1 to nvars(basering)
+    list allVars;
+    for (int var_idx = N+1; var_idx <= nvars(basering); var_idx++) {
+        // Skip variables mentioned in optList
+        int skip_var = 0;
+        if (useOptList == 1) {
+            for (v = 1; v <= size(optList); v++) {
+                if (var_idx == N + optList[v]) {
+                    skip_var = 1;
+                    break;
+                }
+            }
+        }
+        
+        if (skip_var == 0) {
+            allVars = allVars + list(varstr(var_idx));
+        }
+    }
+    
+    // Now check every generator of finalIdeal for each variable
+    list usedVars;
+    for (int genIdx = 1; genIdx <= size(finalIdeal); genIdx++) {
+        string genStr = string(finalIdeal[genIdx]);
+        
+        for (int i = 1; i <= size(allVars); i++) {
+            string varName = allVars[i];
+            
+            // Check various ways the variable might appear in the polynomial
+            if (find(genStr, varName + "*") != 0 || // Middle of term
+                find(genStr, varName + "^") != 0 || // With power
+                find(genStr, "+" + varName) != 0 || // At start after +
+                find(genStr, "-" + varName) != 0 || // At start after -
+                find(genStr, "*" + varName) != 0 || // After multiplication
+                find(genStr, "(" + varName) != 0 || // After parenthesis
+                genStr == varName ||                // Entire generator is this variable
+                find(genStr + "+", varName + "+") != 0) { // At end before +
+                // Add to used vars if not already there
+                int found = 0;
+                for (int j = 1; j <= size(usedVars); j++) {
+                    if (usedVars[j] == varName) {
+                        found = 1;
+                        break;
+                    }
+                }
+                if (found == 0) {
+                    usedVars = usedVars + list(varName);
+                }
+            }
+        }
+    }
+    
+    // Convert used variables list to comma-separated string
+    if (size(usedVars) > 0) {
+        filtered_vars = usedVars[1];
+        for (int i = 2; i <= size(usedVars); i++) {
+            filtered_vars = filtered_vars + "," + usedVars[i];
+        }
+    } else {
+        // If no variables were found, just use a1 as a placeholder
+        filtered_vars = "a1";
+    }
+    
+    // Write filtered output file
+    string outFile = "arc_output.txt";
+    int dummy2 = system("sh","rm -f " + outFile);
+    write(outFile, "ring S = 0, (" + filtered_vars + "), dp;");
+    write(outFile, "ideal A = " + string(finalIdeal) + ";", append);
+}
