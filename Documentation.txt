@@ -1,0 +1,48 @@
+
+version  = "arc.lib 1.0.0.0 (Sep_2025)";
+category = "Algebraic geometry";
+
+info = "
+LIBRARY: arc.lib  - Compute equations of generalized arc/jet schemes
+
+AUTHOR:  Andrew R. Stout (astout@bmcc.cuny.edu)
+
+DESCRIPTION:
+  Computes the equations of a generalized arc space of a scheme defined by ideal I
+  relative to a fat point defined by ideal J, with respect to a list of ambient variables.
+  Optionally, a skip list of coefficient indices can be provided.
+
+PROCEDURES:
+  arc(Vars, I, J, optList)   return list of equations of a generalized arc space
+";
+
+LIB "arc.lib";
+
+// ======================================================================
+// Main user-facing procedure
+// ======================================================================
+proc arc(ideal Vars, ideal I, ideal J, list optList)
+"USAGE:
+  arc(Vars, I, J, optList);
+
+INPUT:
+  Vars    ideal of ambient variables (e.g. (x,y))
+  I       ideal defining the base scheme X
+  J       ideal defining the fat point G embedded in the same ambient ring
+  optList list of positive integers (optional) indicating coefficient indices to skip
+
+RETURN:
+  A ring S whose ideal arcideal contains the defining equations of the generalized arc space
+  in the coefficient variables a1, a2, ...
+
+EXAMPLE:
+  ring R = 0, (x,y), dp;
+  ideal Vars = x,y;
+  ideal I = x4 + y3;
+  ideal J = x2, y2;
+  def s = arc(Vars, I, J, list());
+  setring s; ideal A = arcideal; A;
+
+SEE ALSO:
+  standard.lib (std, kbase), primdec.lib, homolog.lib, normaliz.lib
+"
