@@ -3,7 +3,6 @@ LIB "arc.lib";
 
 //Example 1: 
 ring R = 0, (x,y), dp; 
-ideal V = x,y;
 ideal I = xy;
 ideal J1 = y1;
 ideal J2 = y2; 
@@ -11,11 +10,11 @@ ideal J3 = y3;
 ideal J4 = y4; 
 ideal J5 = y5;
 list L;
-def s1 = arc(V,I,J1,L);
-def s2 = arc(V,I,J2,L);
-def s3 = arc(V,I,J3,L);
-def s4 = arc(V,I,J4,L);
-def s5 = arc(V,I,J5,L);
+def s1 = arc(I,J1,L);
+def s2 = arc(I,J2,L);
+def s3 = arc(I,J3,L);
+def s4 = arc(I,J4,L);
+def s5 = arc(I,J5,L);
 setring s1;
 ideal A1 = arcideal;
 A1;
@@ -48,15 +47,14 @@ A5;
 ==> A5[5]=a5*a6+a4*a7+a3*a8+a2*a9+a1*a10
  //Example 2: 
 ring R = 0, (x,y), dp; 
-ideal V = x,y;
 ideal I = y2-x3;
 ideal J2 = x2; 
 ideal J3 = x3; 
 ideal J4 = x4; 
 list L= list(1,2); // Calculates fiber over origin
-def s2 = arc(V,I,J2,L);
-def s3 = arc(V,I,J3,L);
-def s4 = arc(V,I,J4,L);
+def s2 = arc(I,J2,L);
+def s3 = arc(I,J3,L);
+def s4 = arc(I,J4,L);
 setring s2;
 ideal A2 = arcideal;
 A2;
@@ -72,16 +70,15 @@ A4;
 ==> A4[2]=-a3^3+2*a4*a6
  //Example 3
 ring R = 0, (x,y,z), dp; 
-ideal V = x,y,z;
 ideal I = y2z-x3;
 ideal J2 = y2; 
 ideal J3 = y3; 
 ideal J4 = y4;
 ideal J5 = y5;
-def s2 = arc(V,I,J2,list());
-def s3 = arc(V,I,J3,list());
-def s4 = arc(V,I,J4,list());
-def s5 = arc(V,I,J5,list());
+def s2 = arc(I,J2,list());
+def s3 = arc(I,J3,list());
+def s4 = arc(I,J4,list());
+def s5 = arc(I,J5,list());
 setring s2;
 ideal A2 = arcideal;
 A2;

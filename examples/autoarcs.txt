@@ -1,15 +1,14 @@
 //partially reduced auto-arc examples
 LIB "arc.lib";
-//Example 3
+//Example 1
 ring R = 0 , (x,y), dp; 
-ideal V = x,y;
 ideal I4 = y2 - x3, x4, x3y;
 ideal I5 = y2 - x3, x5, x4y;
 ideal I6 = y2 - x3, x6, x5y;
 list L = list (1,2,4);
-def a4 = arc(V,I4,I4,L);
-def a5 = arc(V,I5,I5,L);
-def a6 = arc(V,I6,I6,L);
+def a4 = arc(I4,I4,L);
+def a5 = arc(I5,I5,L);
+def a6 = arc(I6,I6,L);
 setring a4;
 ideal A = arcideal;
 A;
@@ -33,14 +32,13 @@ C;
 ==> C[6]=-3*a5^2*a7-6*a3*a5*a9-3*a7^2*a9-3*a3^2*a11-6*a3*a7*a13+2*a6*a12+2*a10*a14+2*a8*a16
 //Example 2
 ring R = 0 , (x,y), dp; 
-ideal V = x,y;
 ideal I4 = y3 - x3, x4, x3y;
 ideal I5 = y3 - x3, x5, x4y;
 ideal I6 = y3 - x3, x6, x5y;
 list L = list (1,2);
-def a4 = arc(V,I4,I4,L);
-def a5 = arc(V,I5,I5,L);
-def a6 = arc(V,I6,I6,L);
+def a4 = arc(I4,I4,L);
+def a5 = arc(I5,I5,L);
+def a6 = arc(I6,I6,L);
 setring a4;
 ideal A = arcideal;
 A;

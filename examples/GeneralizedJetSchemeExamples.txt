@@ -1,12 +1,11 @@
 //Generalized Jet Schemes
 LIB "arc.lib"
-
+//Example 1
 ring R = 0, (x,y,z), dp; 
-ideal V = x,y,z;
 ideal I = x3 + y3 +z3;
 ideal J = x3, x2y, y2;
 list L = list(1,2); //fiber over origin
-def a = arc(V,I,J,L);
+def a = arc(I,J,L);
 setring a;
 ideal A = arcideal;
 A;
@@ -15,13 +14,12 @@ A;
 ==> A[3]=3*a3*a6^2+3*a3^2*a9
 ==> A[4]=3*a3^2*a12
 ==> A[5]=6*a3*a6*a12+3*a3^2*a15
-
+//Example 2
 ring R = 0, (x,y,z,w), dp; 
-ideal V = x,y,z,w;
 ideal I = xyzw;
 ideal J = x3, x2y, y2, z3;
 list L = list(); 
-def a = arc(V,I,J,L);
+def a = arc(I,J,L);
 setring a;
 ideal A = arcideal;
 A;
