@@ -1,50 +1,50 @@
+
 //////////////////////////////////////////////////////////////////////
 // arc.lib - Generalized arc space construction for Singular
 //////////////////////////////////////////////////////////////////////
 
-version = "arc.lib 1.1.0.0 Sep_2025";
+version = "arc.lib 1.0.0 Sep_2025";
 category = "Algebraic geometry";
 
 info = "
 LIBRARY: arc.lib  - Construct generalized arc spaces in Singular
-AUTHOR:  Andrew Stout (astout@bmcc.cuny.edu)
+AUTHOR:  Andrew R. Stout (astout@bmcc.cuny.edu)
 
 DESCRIPTION:
-  Computes equations of a generalized arc space of a scheme defined by ideal I
-  relative to a fat point defined by ideal J, with respect to a list of ambient
-  variables. Optionally, a skip list of coefficients can be provided.
+  Computes the equations of a generalized arc space of a scheme defined by ideal I
+  relative to a fat point defined by ideal J. Optionally, a skip list of coefficients can be provided. 
 
-REFERENCE:
+PROCEDURES:
+  arc(I, J, optList); creates ring containing the ideal arcideal in the variables of T (excluding the original variables)
+";
+
+// LIB "arc.lib";
 
 
-USAGE:
-  arc(Vars, I, J, optList);
 
-  Vars:    ideal of ambient variables
+////////////////////////////////////////////////////////////////////////
+// Main user-facing entry point with just 4 parameters
+////////////////////////////////////////////////////////////////////////
+proc arc(ideal I, ideal J, list optList)
+"USAGE:
+  arc(I, J, optList);
+
   I:       ideal defining the scheme
   J:       ideal defining the fat point
   optList: list of integers (optional), indices of coefficients to skip
 
 RETURN:
-  A ring containing the ideal arcideal in the variables of T (ambient variables plus arc coefficients).
+  A ring containing the ideal arcideal in the variables of T (minus the original variables in Vars).
 
 EXAMPLE:
   ring R = 0, (x,y), dp;
-  ideal Vars = x,y;
   ideal I = x^4 + y^3;
   ideal J = x^2,y^2;       // fat point at origin
   list L;                 //  optional skips
-  def s = arc(Vars, I, J, L);
+  def s = arc(I, J, L);
   setring s;
   ideal A = arcideal;
   A; 
-"
-
-////////////////////////////////////////////////////////////////////////
-// Main user-facing entry point with just 4 parameters
-////////////////////////////////////////////////////////////////////////
-proc arc(ideal Vars, ideal I, ideal J, list optList)
-"USAGE: arc(Vars, I, J, optList);
 RETURN: ring containing ideal arcideal in the variables of T"
 {
     option(noredefine);
@@ -70,23 +70,32 @@ RETURN: ring containing ideal arcideal in the variables of T"
     }
     // Call arc_internal with explicit type conversion
     int useOptList_int = int(useOptList);
-    return( arc_internal(Vars, I, J, optList, useOptList_int) );
+    return( arc_internal(I, J, optList, useOptList_int) );
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Core implementation (no disk output, returns final ideal directly)
 ////////////////////////////////////////////////////////////////////////
-proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
+proc arc_internal(ideal I, ideal J, list optList, int useOptList)
 {
     option(noredefine);
-    def origRing = basering;   // add this
-    ///////////
-    // Compute and store global count at start of arc_internal
-    ///////////
-    int N = size(Vars);
+    def R0 = basering;
+    int N = nvars(R0);
+    // Build comma-separated list of original variable names safely
+    string v = varstr(1);
+    for (int k1 = 2; k1 <= N; k1++)
+    {
+        v = v + "," + varstr(k1);
+    }
+
+    // Create helper ring with identical names, then import
+    execute("ring Rhelp = 0, (" + v + "), dp;");
+    setring Rhelp;
+    ideal Ihelp = imap(R0, I);
+    ideal Jhelp = imap(R0, J);
     int M = size(optList);
 
-    if (J == 0) { print("Error: The ideal J is the zero ideal. Terminating."); return; }
+    if (Jhelp == 0) { print("Error: The ideal Jhelp is the zero ideal. Terminating."); return; }
      
     ///////////
     // Step 2: identify fat point variables
@@ -100,11 +109,11 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
     flag1 = 0;
     currentVar = var(idx1);
 
-    for (jdx1 = 1; jdx1 <= size(J); jdx1++)
+    for (jdx1 = 1; jdx1 <= size(Jhelp); jdx1++)
     {
             intvec w = 0:N;
             w[idx1] = 1;
-            if (deg(J[jdx1], w) > 0)          //A stricter test is to use reduced
+            if (deg(Jhelp[jdx1], w) > 0)          //A stricter test is to use reduced
             {
                 flag1 = 1; break;
             }
@@ -118,11 +127,8 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
     ///////////
     // Step 3: store strings
     ///////////
-    string T_vars = string(Vars[1]);
-    for (int idx2 = 2; idx2 <= N; idx2++) {
-        T_vars = T_vars + "," + string(Vars[idx2]);
-    }
-    string I_stored = string(I);
+    // Use original variable list 'v' captured from R0 when building Rhelp
+    string T_vars = v;
 
     ///////////
     // Step 4: new ring F
@@ -132,24 +138,21 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
     for (int idx3 = 2; idx3 <= size(fatVars); idx3++) {
         varsString = varsString + "," + string(fatVars[idx3]);
     }
-    string J_str = string(J);
     execute("ring F = 0, (" + varsString + "), dp;");
     execute("setring F;");
     option(noredefine);
-    execute("ideal J_F = " + J_str + ";");
+    ideal J_F = imap(Rhelp, Jhelp);
 
     ///////////
     // Step 6: standard basis
     ///////////
-    ideal G = std(J_F);
+    ideal G_F = std(J_F);
 
     ///////////
     // Step 7: use kbase
     ///////////
-    ideal basis_JF = kbase(G);
-    int len_JF     = size(basis_JF);
-    string G_str   = string(G);
-    string B_str   = string(basis_JF);
+    ideal basis_JF_F = kbase(G_F);
+    int len_JF       = size(basis_JF_F);
 
     ///////////
     // Step 8: new ring T
@@ -164,10 +167,9 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
     option(noredefine);
 
     
-    execute("ideal I_T    = " + I_stored  + ";");
-    execute("ideal tmpG_T  = " + G_str     + ";");
-    ideal G_T        = std(tmpG_T);
-    execute("list basis_JF_T = (" + B_str + ");");
+    ideal I_T        = imap(Rhelp, Ihelp);
+    ideal G_T        = std( imap(F, G_F) );
+    ideal basis_JF_T = imap(F, basis_JF_F);
     if (basis_JF_T[len_JF] != 1)
     {
         print("Error: last basis_JF_T != 1."); return;
@@ -238,7 +240,7 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
     poly f, term, basisElement;
     poly old_f, old_term;
     matrix coefMatrix;
-    int basisIdx, i2, kdx8, v, varIdx, shouldKeep;
+    int basisIdx, i2, kdx8, optIdx, varIdx, shouldKeep;
     string varToFind, termStr;
     int ov = 0;
 
@@ -279,9 +281,9 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
                     shouldKeep = 1;
                     if (useOptList == 1)
                     {
-                        for (v=1;v<=size(optList);v++)
+                        for (optIdx=1; optIdx<=size(optList); optIdx++)
                         {
-                            varIdx = optList[v];
+                            varIdx = optList[optIdx];
                             varToFind = "a"+string(varIdx)+"*";
                             termStr   = string(term)+"*";
                             if (find(termStr,varToFind)!=0)
@@ -319,9 +321,9 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
             shouldKeep = 1;
             if (useOptList==1)
             {
-                for (v=1; v<=size(optList); v++)
+                for (optIdx=1; optIdx<=size(optList); optIdx++)
                 {
-                    varIdx = optList[v];
+                    varIdx = optList[optIdx];
                     if (varIdx <= 0) { continue; }  // Skip invalid indices
                     
                     varToFind = "a"+string(varIdx)+"*";
@@ -345,7 +347,7 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
     ///////////
     poly ct;
     ideal simplifiedFinal = 0;
-    int shouldKeep, v, i2;
+    int shouldKeep, i2;
     string varToFind, termStr;
 
     for (i2 = 1; i2 <= size(arcideal); i2++)
@@ -355,9 +357,9 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
         shouldKeep = 1;
         if (useOptList == 1)
         {
-            for (v=1; v<=size(optList); v++)
+            for (optIdx=1; optIdx<=size(optList); optIdx++)
             {
-                varToFind = "a" + string(optList[v]) + "*";
+                varToFind = "a" + string(optList[optIdx]) + "*";
                 termStr   = string(ct) + "*";
                 if (find(termStr, varToFind) != 0)
                 {
@@ -413,8 +415,8 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
         // Skip variables mentioned in optList
         int skip_var = 0;
         if (useOptList == 1) {
-            for (v = 1; v <= size(optList); v++) {
-                if (var_idx == N + optList[v]) {
+            for (optIdx = 1; optIdx <= size(optList); optIdx++) {
+                if (var_idx == N + optList[optIdx]) {
                     skip_var = 1;
                     break;
                 }
@@ -487,7 +489,7 @@ proc arc_internal(ideal Vars, ideal I, ideal J, list optList, int useOptList)
         coeff_vars = "a1";
     }
 
-    setring origRing;
+    setring R0;
     execute("ring S_coeff = 0, (" + coeff_vars + "), dp;");
     execute("setring S_coeff;");
     execute("ideal arcideal = " + arcideal_str + ";");
