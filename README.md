@@ -12,31 +12,20 @@ NOTE: In regards to the third argument, which is a list. If the user just wants 
 NOTE: There is a debug version with the debug folder: debugarc v1.0.0 which is paired down version, but it produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. 
 
 Examples: 
- //Example 1:
 
+ {//Example 1:
   ring R = 0, (x,y), dp;
-
   ideal I = x^4 + y^3;
-
   ideal J = x^2,y^2;       // fat point at origin
-
   list L;                 //  optional skips
-
   def s = arc(Vars, I, J, L);
-
   setring s;
-
   ideal A = arcideal;
-
   A;
-
 ==> A[1]=a1^4+a2^3
-
 ==> A[2]=4*a1^3*a3+3*a2^2*a4
-
 ==> A[3]=4*a1^3*a5+3*a2^2*a6
-
-==> A[4]=12*a1^2*a3*a5+4*a1^3*a7+6*a2*a4*a6+3*a2^2*a8
+==> A[4]=12*a1^2*a3*a5+4*a1^3*a7+6*a2*a4*a6+3*a2^2*a8}
 
 
  //Example 2: 
