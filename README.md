@@ -14,6 +14,7 @@ NOTE: There is a debug version with the debug folder: debugarc v1.0.0 which is p
 Examples: 
 
  {//Example 1:
+ 
   ring R = 0, (x,y), dp;
   ideal I = x^4 + y^3;
   ideal J = x^2,y^2;       // fat point at origin
