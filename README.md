@@ -1,12 +1,15 @@
 # arc.lib
 A Singular library for generalized jet schemes computations with fast partial reduction
 
-This is the initial version: arc v2.0.0.0 
-and is designed as a supplement to a submitted paper. Later versions are expected. 
+This is the initial version: arc v1.0.0 and is designed as a supplement to a submitted paper. 
 
-This library is basically one main singular procedure arc(ideal, ideal ,ideal , list) where the first ideal is a list of variables of a polynomial ring, the second is a list of generators of an ideal, and the third is a list of generators of a second ideal describing a embedded fat point. The final argument is a list of indexes which sets particular variables to zero. A list of examples will be added later to the folder examples. 
+This library is basically one main singular procedure arc(ideal ,ideal , list) where the first ideal is a list of generators of an ideal of ring R (this basering should be of characteristic zero), and the third is a list of generators of a second ideal describing a embedded fat point. What is meant here by embedded fat point is that J is an ideal of R also, and the auxiliary ring D created by only the variables used in J creates a zero dimensional quotient ring $D/J$. The final argument is a list of indexes which sets particular variables to zero. A list of examples will be added to the folder examples. 
 
-There is a debug version with the debug folder: debugarc v1.0.0.0 which is essentially the same but produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. 
+NOTE: In regards to the second argument J, the variables used are usually chosen to be sequently -- first m variables or the last m variables, but theoretically any choice of variables from the basering R can be used as long as they define a ring of Krull dimension 0. 
+
+NOTE: In regards to the third argument, which is a list. If the user just wants the list of equations, one should input an empty list, which is usually done by running arc(I,J,list()).
+
+NOTE: There is a debug version with the debug folder: debugarc v1.0.0 which is paired down version, but it produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. 
 
 Examples: 
  //Example 1:
@@ -19,10 +22,12 @@ Examples:
   setring s;
   ideal A = arcideal;
   A;
+
 ==> A[1]=a1^4+a2^3
 ==> A[2]=4*a1^3*a3+3*a2^2*a4
 ==> A[3]=4*a1^3*a5+3*a2^2*a6
 ==> A[4]=12*a1^2*a3*a5+4*a1^3*a7+6*a2*a4*a6+3*a2^2*a8
+
  //Example 2: 
   ring R = 0, (x,y), dp;
   ideal Vars = x,y;
@@ -34,12 +39,14 @@ Examples:
   ideal A = arcideal;
   s;
   A;
+
 ==> // coefficients: QQ considered as a field
 ==> // number of vars : 6
 ==> //        block   1 : ordering dp
 ==> //                  : names    a3 a4 a5 a6 a7 a8
 ==> //        block   2 : ordering C
 ==> A[1]=0
+
  //Example 3:
 ring R = 0 ,(x,y), dp;
 ideal V = x,y;
@@ -49,9 +56,11 @@ def s = arc(V, I, K, list());
 setring s;
 ideal A = arcideal;
 A;
+
 ==> A[1]=a1*a2
 ==> A[2]=a2*a3+a1*a4
 ==> A[3]=a3*a4+a2*a5+a1*a6
+
  //Example 4: 
 ring R = 0, (x(1..4)), dp;
 ideal V = x(1), x(2), x(3), x(4);
@@ -61,11 +70,13 @@ def s = arc(V, I, J, list());
 setring s;
 ideal A = arcideal;
 A;
+
 ==> A[1]=a1*a4^2+a1^2-2*a2*a3
 ==> A[2]=a4^2*a5+2*a1*a4*a8+2*a1*a5-2*a3*a6-2*a2*a7
 ==> A[3]=2*a4*a5*a8+a1*a8^2+a4^2*a9+2*a1*a4*a12+a5^2-2*a6*a7+2*a1*a9-2*a3*a10-2*a2*a11
 ==> A[4]=a5*a8^2+2*a4*a8*a9+2*a4*a5*a12+2*a1*a8*a12+a4^2*a13+2*a1*a4*a16+2*a5*a9-2*a7*a10-2*a6*a11+2*a1*a13-2*a3*a14-2*a2*a15
 ==> A[5]=a8^2*a9+2*a5*a8*a12+2*a4*a9*a12+a1*a12^2+2*a4*a8*a13+2*a4*a5*a16+2*a1*a8*a16+a4^2*a17+2*a1*a4*a20+a9^2-2*a10*a11+2*a5*a13-2*a7*a14-2*a6*a15+2*a1*a17-2*a3*a18-2*a2*a19
+
  //Example 4:
 ring R = 0, (x,y), dp;
 ideal V = x,y;
@@ -75,6 +86,7 @@ def s = arc(V,I,I,L);
 setring s;
 ideal A = arcideal;
 A;
+
 ==> A[1]=a1^3*a2
 ==> A[2]=3*a1^2*a2*a3+a1^3*a4
 ==> A[3]=3*a1*a2*a3^2+3*a1^2*a3*a4+3*a1^2*a2*a5+a1^3*a6
@@ -96,6 +108,7 @@ A;
 ==> A[19]=-6*a1*a3*a7-3*a1^2*a9+2*a4*a8+2*a2*a10
 ==> A[20]=-3*a3^2*a7-6*a1*a5*a7-6*a1*a3*a9-3*a1^2*a11+2*a6*a8+2*a4*a10+2*a2*a12
 ==> A[21]=-a3^3-6*a1*a3*a5-3*a1*a7^2-3*a1^2*a13+2*a4*a6+a8^2+2*a2*a14
+
  //Example 5:
 ring R = 0, (x,y), dp;
 ideal V = x,y;
@@ -105,5 +118,6 @@ def s = arc(V,I,I,L);
 setring s;
 ideal A = arcideal;
 A;
+
 ==> A[1]=-3*a3^2*a7+2*a6*a8
 ==> A[2]=-a3^3+a8^2
