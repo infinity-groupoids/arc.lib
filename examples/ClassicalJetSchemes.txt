@@ -11,35 +11,34 @@ ideal J2 = y2;
 ideal J3 = y3; 
 ideal J4 = y4; 
 ideal J5 = y5;
-list L;
-def s1 = arc(I,J1,L);
-def s2 = arc(I,J2,L);
-def s3 = arc(I,J3,L);
-def s4 = arc(I,J4,L);
-def s5 = arc(I,J5,L);
-setring s1;
+def S1 = arc(I,J1);
+def S2 = arc(I,J2);
+def S3 = arc(I,J3);
+def S4 = arc(I,J4);
+def S5 = arc(I,J5);
+setring S1;
 ideal A1 = arcideal;
 A1;
 ==> A1[1]=a1*a2
-setring s2;
+setring S2;
 ideal A2 = arcideal;
 ==> A2[1]=a1*a2
 ==> A2[2]=a2*a3+a1*a4
 A2;
-setring s3;
+setring S3;
 ideal A3 = arcideal;
 A3;
 ==> A3[1]=a1*a2
 ==> A3[2]=a2*a3+a1*a4
 ==> A3[3]=a3*a4+a2*a5+a1*a6
-setring s4;
+setring S4;
 ideal A4 = arcideal;
 A4;
 ==> A4[1]=a1*a2
 ==> A4[2]=a2*a3+a1*a4
 ==> A4[3]=a3*a4+a2*a5+a1*a6
 ==> A4[4]=a4*a5+a3*a6+a2*a7+a1*a8
-setring s5;
+setring S5;
 ideal A5 = arcideal;
 A5;
 ==> A5[1]=a1*a2
@@ -56,18 +55,18 @@ ideal J2 = x2;
 ideal J3 = x3; 
 ideal J4 = x4; 
 list L= list(1,2); // Calculates fiber over origin
-def s2 = arc(I,J2,L);
-def s3 = arc(I,J3,L);
-def s4 = arc(I,J4,L);
-setring s2;
+def S2 = arc(I,J2,L);
+def S3 = arc(I,J3,L);
+def S4 = arc(I,J4,L);
+setring S2;
 ideal A2 = arcideal;
 A2;
 ==> A2[1]=0
-setring s3;
+setring S3;
 ideal A3 = arcideal;
 A3;
 ==> A3[1]=a4^2
-setring s4;
+setring S4;
 ideal A4 = arcideal;
 A4;
 ==> A4[1]=a4^2
@@ -81,29 +80,29 @@ ideal J2 = y2;
 ideal J3 = y3; 
 ideal J4 = y4;
 ideal J5 = y5;
-def s2 = arc(I,J2,list());
-def s3 = arc(I,J3,list());
-def s4 = arc(I,J4,list());
-def s5 = arc(I,J5,list());
-setring s2;
+def S2 = arc(I,J2);
+def S3 = arc(I,J3);
+def S4 = arc(I,J4);
+def S5 = arc(I,J5);
+setring S2;
 ideal A2 = arcideal;
 A2;
 ==> A2[1]=-a1^3+a2^2*a3
 ==> A2[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
-setring s3;
+setring S3;
 ideal A3 = arcideal;
 A3;
 ==> A3[1]=-a1^3+a2^2*a3
 ==> A3[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 ==> A3[3]=-3*a1*a4^2+a3*a5^2+2*a2*a5*a6-3*a1^2*a7+2*a2*a3*a8+a2^2*a9
-setring s4;
+setring S4;
 ideal A4 = arcideal;
 A4;
 ==> A4[1]=-a1^3+a2^2*a3
 ==> A4[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 ==> A4[3]=-3*a1*a4^2+a3*a5^2+2*a2*a5*a6-3*a1^2*a7+2*a2*a3*a8+a2^2*a9
 ==> A4[4]=-a4^3+a5^2*a6-6*a1*a4*a7+2*a3*a5*a8+2*a2*a6*a8+2*a2*a5*a9-3*a1^2*a10+2*a2*a3*a11+a2^2*a12
-setring s5;
+setring S5;
 ideal A5 = arcideal;
 A5;
 ==> A5[1]=-a1^3+a2^2*a3

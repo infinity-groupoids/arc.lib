@@ -15,7 +15,7 @@ DESCRIPTION:
   relative to a fat point defined by ideal J. Optionally, a skip list of coefficients can be provided. 
 
 PROCEDURES:
-  arc(I, J, optList); creates ring containing the ideal arcideal in the variables of T (excluding the original variables)
+  arc(I, J, optList); creates ring containing the ideal arcideal in the variables of T (excluding the original variables), optList is optional argument.
 ";
 
 // LIB "arc.lib";
@@ -23,9 +23,37 @@ PROCEDURES:
 
 
 ////////////////////////////////////////////////////////////////////////
-// Main user-facing entry point with just 4 parameters
+// Main user-facing entry point with 2 or 3 parameters
 ////////////////////////////////////////////////////////////////////////
-proc arc(ideal I, ideal J, list optList)
+// Dispatcher with optional third argument: arc(I,J) or arc(I,J,optList)
+proc arc(list #)
+"USAGE:\n  arc(I, J);\n  arc(I, J, optList);\n\n  I:       ideal defining the scheme\n  J:       ideal defining the fat point\n  optList: list of integers (optional), indices of coefficients to skip\n\nRETURN:\n  A ring containing the ideal arcideal in the variables of T."
+{
+    option(noredefine);
+    int argc = size(#);
+    if (argc == 2)
+    {
+        ideal I = #[1];
+        ideal J = #[2];
+        list optList;                      // empty list
+        int useOptList_int = 0;
+        return( arc_internal(I, J, optList, useOptList_int) );
+    }
+    if (argc == 3)
+    {
+        ideal I = #[1];
+        ideal J = #[2];
+        list optList = #[3];
+        int useOptList_int = 0;
+        if (size(optList) > 0) { useOptList_int = 1; }
+        return( arc_internal(I, J, optList, useOptList_int) );
+    }
+    print("Usage: arc(I,J) or arc(I,J,optList)");
+    return;
+}
+
+// Backward-compatible explicit arity entry point
+proc arc_with_options(ideal I, ideal J, list optList)
 "USAGE:
   arc(I, J, optList);
 
@@ -41,10 +69,21 @@ EXAMPLE:
   ideal I = x^4 + y^3;
   ideal J = x^2,y^2;       // fat point at origin
   list L;                 //  optional skips
-  def s = arc(I, J, L);
-  setring s;
+  def S = arc(I, J, L);  // same as def S = arc(I,J);
+  setring S;
   ideal A = arcideal;
+  S;
+==> // coefficients: QQ considered as a field
+==> // number of vars : 8
+==> //        block   1 : ordering dp
+==> //                  : names    a1 a2 a3 a4 a5 a6 a7 a8
+==> //        block   2 : ordering C
   A; 
+==> A[1]=a1^4+a2^3
+==> A[2]=4*a1^3*a3+3*a2^2*a4
+==> A[3]=4*a1^3*a5+3*a2^2*a6
+==> A[4]=12*a1^2*a3*a5+4*a1^3*a7+6*a2*a4*a6+3*a2^2*a8
+
 RETURN: ring containing ideal arcideal in the variables of T"
 {
     option(noredefine);

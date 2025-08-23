@@ -4,7 +4,7 @@ LIB "arc.lib";
 ```
 
 ```
-// Example 1
+// Example 1:
 ring R = 0 , (x,y), dp; 
 ideal I4 = y2 - x3, x4, x3y;
 ideal I5 = y2 - x3, x5, x4y;
