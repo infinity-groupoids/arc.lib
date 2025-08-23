@@ -1,17 +1,26 @@
 # arc.lib
-A Singular library for generalized jet schemes computations with fast partial reduction
+A Singular library for generalized jet schemes computations with fast partial reduction.
 
-This is the initial version: arc v1.0.0 and is designed as a supplement to a submitted paper. 
+#Description:
+This library is basically one main singular procedure def S = arc(ideal ,ideal , list). The first two arguments (which are ideals) occur in a basring R (this basering should be of characteristic zero). The first ideal is the ideal of definition of an affine scheme X, and the second describes a embedded fat point in X. To be clear, an embedded fat point is given by an ideal J  such that the auxiliary ring D created by only the variables used in J creates a zero dimensional quotient ring D/J. The third argument is a list of indexes which sets particular variables to zero. A list of examples will be added to the folder examples. 
 
-This library is basically one main singular procedure arc(ideal ,ideal , list) where the first ideal is a list of generators of an ideal of ring R (this basering should be of characteristic zero), and the third is a list of generators of a second ideal describing a embedded fat point. What is meant here by embedded fat point is that J is an ideal of R also, and the auxiliary ring D created by only the variables used in J creates a zero dimensional quotient ring $D/J$. The final argument is a list of indexes which sets particular variables to zero. A list of examples will be added to the folder examples. 
 
-NOTE: In regards to the second argument J, the variables used are usually chosen to be sequently -- first m variables or the last m variables, but theoretically any choice of variables from the basering R can be used as long as they define a ring of Krull dimension 0. 
 
-NOTE: In regards to the third argument, which is a list. If the user just wants the list of equations, one should input an empty list, which is usually done by running arc(I,J,list()).
+#Notes:
+1) In regards to the second argument J, the variables used are usually chosen to be sequential--the first m variables or the last m variables. However, theoretically, any choice of variables from the basering R can be used as long as they define a ring D/J of Krull dimension 0. See previous paragraph fo clarity. 
 
-NOTE: There is a debug version with the debug folder: debugarc v1.0.0 which is paired down version, but it produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. 
+2) In regards to the third argument, if the user wishes not to set any of the variables to zero, one should input an empty list, which is usually done by running def S = arc(I,J,list()).
 
-Examples: 
+3) There is a debug version with the debug folder: debugarc v1.0.0 which is paired down version, but it produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. It can also be useful for exploratory purposes.  
+
+
+
+#Goal:
+The goal of this project is to provide a library which completes efficient computations of generalized jet schemes of affine algebraic varieties within the Singular computer algebra system. This library represents a significant improvement over previous Sage implementations, offering enhanced speed, reduced memory usage, and a novel iterative reduction approach for studying jet schemes. The software enables direct computation of jet scheme equations with respect to arbitrary fat points, supporting advanced research in singularity theory and algebraic geometry. The lond term goal is to investigate various questions related to partially reduced structures on generalized jet schemes of fat points and related questions raised by the author on induced flatness between reduced generalized jet schemes.
+
+
+
+#Examples: 
 ```
 // Example 1:
 ring R = 0, (x,y), dp;
