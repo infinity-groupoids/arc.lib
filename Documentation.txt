@@ -1,4 +1,3 @@
-
 version  = "arc.lib 1.0.0 (Sep_2025)";
 category = "Algebraic geometry";
 
