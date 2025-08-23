@@ -1,12 +1,12 @@
 # arc.lib
 A Singular library for generalized jet schemes computations with fast partial reduction.
 
-#Description:
+## Description:
 This library is basically one main singular procedure def S = arc(ideal ,ideal , list). The first two arguments (which are ideals) occur in a basring R (this basering should be of characteristic zero). The first ideal is the ideal of definition of an affine scheme X, and the second describes a embedded fat point in X. To be clear, an embedded fat point is given by an ideal J  such that the auxiliary ring D created by only the variables used in J creates a zero dimensional quotient ring D/J. The third argument is a list of indexes which sets particular variables to zero. A list of examples will be added to the folder examples. 
 
 
 
-#Notes:
+## Notes:
 1) In regards to the second argument J, the variables used are usually chosen to be sequential--the first m variables or the last m variables. However, theoretically, any choice of variables from the basering R can be used as long as they define a ring D/J of Krull dimension 0. See previous paragraph fo clarity. 
 
 2) In regards to the third argument, if the user wishes not to set any of the variables to zero, one should input an empty list, which is usually done by running def S = arc(I,J,list()).
@@ -15,12 +15,12 @@ This library is basically one main singular procedure def S = arc(ideal ,ideal ,
 
 
 
-#Goal:
+## Goal:
 The goal of this project is to provide a library which completes efficient computations of generalized jet schemes of affine algebraic varieties within the Singular computer algebra system. This library represents a significant improvement over previous Sage implementations, offering enhanced speed, reduced memory usage, and a novel iterative reduction approach for studying jet schemes. The software enables direct computation of jet scheme equations with respect to arbitrary fat points, supporting advanced research in singularity theory and algebraic geometry. The lond term goal is to investigate various questions related to partially reduced structures on generalized jet schemes of fat points and related questions raised by the author on induced flatness between reduced generalized jet schemes.
 
 
 
-#Examples: 
+## Examples: 
 ```
 // Example 1:
 ring R = 0, (x,y), dp;
