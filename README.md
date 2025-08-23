@@ -12,7 +12,8 @@ NOTE: In regards to the third argument, which is a list. If the user just wants 
 NOTE: There is a debug version with the debug folder: debugarc v1.0.0 which is paired down version, but it produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. 
 
 Examples: 
-
+```
+{ // Example 1:
   ring R = 0, (x,y), dp;
   ideal I = x^4 + y^3;
   ideal J = x^2,y^2;   // fat point at origin
@@ -21,7 +22,8 @@ Examples:
   setring s;
   ideal A = arcideal;
   s;
-  A;
+  A;}
+  ```
 
 ==> // coefficients: QQ considered as a field
 ==> // number of vars : 6
