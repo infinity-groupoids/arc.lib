@@ -2,14 +2,14 @@
 A Singular library for generalized jet schemes computations with fast partial reduction.
 
 ## Description:
-This library is basically one main singular procedure def S = arc(ideal ,ideal , list). The first two arguments (which are ideals) occur in a basring R (this basering should be of characteristic zero). The first ideal is the ideal of definition of an affine scheme X, and the second describes a embedded fat point in X. To be clear, an embedded fat point is given by an ideal J  such that the auxiliary ring D created by only the variables used in J creates a zero dimensional quotient ring D/J. The third argument is a list of indexes which sets particular variables to zero. A list of examples will be added to the folder examples. 
+This library is basically one main singular procedure def S = arc(ideal , ideal , list). The first two arguments (which are ideals) occur in a basring R (this basering should be of characteristic zero). The first ideal is the ideal of definition of an affine scheme X, and the second describes a embedded fat point in X. To be clear, an embedded fat point is given by an ideal J such that the auxiliary ring D created by only the variables used in J creates a zero dimensional quotient ring D/J. The third (optional) argument is a list of indexes which sets particular variables to zero. A list of examples will be added to the folder examples. 
 
 
 
 ## Notes:
 1) In regards to the second argument J, the variables used are usually chosen to be sequential--the first m variables or the last m variables. However, theoretically, any choice of variables from the basering R can be used as long as they define a ring D/J of Krull dimension 0. See previous paragraph fo clarity. 
 
-2) In regards to the third argument, if the user wishes not to set any of the variables to zero, one should input an empty list, which is usually done by running def S = arc(I,J,list()).
+2) In regards to the third argument, if the user wishes not to set any of the variables to zero, one can input an empty list, which is usually done by running def S = arc(I,J,list()). Otherwise, one can simply run def S = arc(I,J).
 
 3) There is a debug version with the debug folder: debugarc v1.0.0 which is paired down version, but it produces output files arc_original_output.txt, arc_output.txt, and arc_debug.txt file for further development purposes. It can also be useful for exploratory purposes.  
 
@@ -46,10 +46,10 @@ ring R = 0, (x,y), dp;
 ideal I = x^4 + y^3;
 ideal J = x^2,y^2;   // fat point at origin
 list L = list(1,2);  // fiber of origin
-def s = arc(Vars, I, J, L);
-setring s;
+def S = arc(I, J, L);
+setring S;
 ideal A = arcideal;
-s;
+S;
 A;
 ==> // coefficients: QQ considered as a field
 ==> // number of vars : 6
@@ -64,8 +64,8 @@ A;
 ring R = 0 ,(x,y), dp;
 ideal I = xy; 
 ideal K = x3; 
-def s = arc(I, K, list());
-setring s;
+def S = arc(I, K, list()); // Empty list
+setring S;
 ideal A = arcideal;
 A;
 ==> A[1]=a1*a2
@@ -78,8 +78,8 @@ A;
 ring R = 0, (x(1..4)), dp;
 ideal I = x(1)**2 - 2*x(2)*x(3) + x(1)*x(4)**2;
 ideal J = x(4)^5;
-def s = arc(I, J, list());
-setring s;
+def S = arc(I, J);  // Using only two arguments: equivalent to Example 3
+setring S;
 ideal A = arcideal;
 A;
 ==> A[1]=a1*a4^2+a1^2-2*a2*a3
@@ -93,9 +93,8 @@ A;
 // Example 4:
 ring R = 0, (x,y), dp;
 ideal I = y2- x3, x4, x3y;
-list L;
-def s = arc(I,I,L);
-setring s;
+def S = arc(I,I);
+setring S;
 ideal A = arcideal;
 A;
 ==> A[1]=a1^3*a2
@@ -125,9 +124,9 @@ A;
 // Example 5:
 ring R = 0, (x,y), dp;
 ideal I = y2- x3, x4, x3y;
-list L=1,2,4;
-def s = arc(I,I,L);
-setring s;
+list L = 1,2,4;
+def S = arc(I,I,L);
+setring S;
 ideal A = arcideal;
 A;
 ==> A[1]=-3*a3^2*a7+2*a6*a8
