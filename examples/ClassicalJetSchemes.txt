@@ -1,7 +1,9 @@
 //Classical jet scheme examples
+```
 LIB "arc.lib";
-
-//Example 1: 
+```
+```
+// Example 1: 
 ring R = 0, (x,y), dp; 
 ideal I = xy;
 ideal J1 = y1;
@@ -18,34 +20,36 @@ def s5 = arc(I,J5,L);
 setring s1;
 ideal A1 = arcideal;
 A1;
+==> A1[1]=a1*a2
 setring s2;
 ideal A2 = arcideal;
+==> A2[1]=a1*a2
+==> A2[2]=a2*a3+a1*a4
 A2;
 setring s3;
 ideal A3 = arcideal;
 A3;
-setring s4;
-ideal A4 = arcideal;
-A4;
-setring s5;
-ideal A5 = arcideal;
-A5;
-==> A1[1]=a1*a2
-==> A2[1]=a1*a2
-==> A2[2]=a2*a3+a1*a4
 ==> A3[1]=a1*a2
 ==> A3[2]=a2*a3+a1*a4
 ==> A3[3]=a3*a4+a2*a5+a1*a6
+setring s4;
+ideal A4 = arcideal;
+A4;
 ==> A4[1]=a1*a2
 ==> A4[2]=a2*a3+a1*a4
 ==> A4[3]=a3*a4+a2*a5+a1*a6
 ==> A4[4]=a4*a5+a3*a6+a2*a7+a1*a8
+setring s5;
+ideal A5 = arcideal;
+A5;
 ==> A5[1]=a1*a2
 ==> A5[2]=a2*a3+a1*a4
 ==> A5[3]=a3*a4+a2*a5+a1*a6
 ==> A5[4]=a4*a5+a3*a6+a2*a7+a1*a8
 ==> A5[5]=a5*a6+a4*a7+a3*a8+a2*a9+a1*a10
- //Example 2: 
+```
+```
+ // Example 2: 
 ring R = 0, (x,y), dp; 
 ideal I = y2-x3;
 ideal J2 = x2; 
@@ -58,17 +62,19 @@ def s4 = arc(I,J4,L);
 setring s2;
 ideal A2 = arcideal;
 A2;
+==> A2[1]=0
 setring s3;
 ideal A3 = arcideal;
 A3;
+==> A3[1]=a4^2
 setring s4;
 ideal A4 = arcideal;
 A4;
-==> A2[1]=0
-==> A3[1]=a4^2
 ==> A4[1]=a4^2
 ==> A4[2]=-a3^3+2*a4*a6
- //Example 3
+```
+```
+ // Example 3:
 ring R = 0, (x,y,z), dp; 
 ideal I = y2z-x3;
 ideal J2 = y2; 
@@ -82,28 +88,29 @@ def s5 = arc(I,J5,list());
 setring s2;
 ideal A2 = arcideal;
 A2;
+==> A2[1]=-a1^3+a2^2*a3
+==> A2[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 setring s3;
 ideal A3 = arcideal;
 A3;
-setring s4;
-ideal A4 = arcideal;
-A4;
-setring s5;
-ideal A5 = arcideal;
-A5;
-==> A2[1]=-a1^3+a2^2*a3
-==> A2[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 ==> A3[1]=-a1^3+a2^2*a3
 ==> A3[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 ==> A3[3]=-3*a1*a4^2+a3*a5^2+2*a2*a5*a6-3*a1^2*a7+2*a2*a3*a8+a2^2*a9
+setring s4;
+ideal A4 = arcideal;
+A4;
 ==> A4[1]=-a1^3+a2^2*a3
 ==> A4[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 ==> A4[3]=-3*a1*a4^2+a3*a5^2+2*a2*a5*a6-3*a1^2*a7+2*a2*a3*a8+a2^2*a9
 ==> A4[4]=-a4^3+a5^2*a6-6*a1*a4*a7+2*a3*a5*a8+2*a2*a6*a8+2*a2*a5*a9-3*a1^2*a10+2*a2*a3*a11+a2^2*a12
+setring s5;
+ideal A5 = arcideal;
+A5;
 ==> A5[1]=-a1^3+a2^2*a3
 ==> A5[2]=-3*a1^2*a4+2*a2*a3*a5+a2^2*a6
 ==> A5[3]=-3*a1*a4^2+a3*a5^2+2*a2*a5*a6-3*a1^2*a7+2*a2*a3*a8+a2^2*a9
 ==> A5[4]=-a4^3+a5^2*a6-6*a1*a4*a7+2*a3*a5*a8+2*a2*a6*a8+2*a2*a5*a9-3*a1^2*a10+2*a2*a3*a11+a2^2*a12
 ==>
 A5[5]=-3*a4^2*a7-3*a1*a7^2+2*a5*a6*a8+a3*a8^2+a5^2*a9+2*a2*a8*a9-6*a1*a4*a10+2*a3*a5*a11+2*a2*a6*a11+2*a2*a5*a12-3*a1^2*a13+2*a2*a3*a14+a2^2*a15
+```
  

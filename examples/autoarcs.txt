@@ -1,59 +1,62 @@
 //partially reduced auto-arc examples
+```
 LIB "arc.lib";
-//Example 1
+```
+
+```
+// Example 1
 ring R = 0 , (x,y), dp; 
 ideal I4 = y2 - x3, x4, x3y;
 ideal I5 = y2 - x3, x5, x4y;
 ideal I6 = y2 - x3, x6, x5y;
 list L = list (1,2,4);
-def a4 = arc(I4,I4,L);
-def a5 = arc(I5,I5,L);
-def a6 = arc(I6,I6,L);
-setring a4;
+def S4 = arc(I4,I4,L);
+def S5 = arc(I5,I5,L);
+def S6 = arc(I6,I6,L);
+setring S4;
 ideal A = arcideal;
 A;
-setring a5;
-ideal B = arcideal;
-B;
-setring a6;
-ideal C = arcideal;
-C;
 ==> A[1]=-3*a3^2*a7+2*a6*a8
 ==> A[2]=-a3^3+a8^2
+setring S5;
+ideal B = arcideal;
+B;
 ==> B[1]=-a3^3+a8^2
 ==> B[2]=-3*a3^2*a7+2*a6*a8
 ==> B[3]=-3*a3^2*a5-3*a3*a7^2+a6^2+2*a8*a10
 ==> B[4]=-6*a3*a5*a7-a7^3-3*a3^2*a9+2*a6*a10+2*a8*a14
+setring S6;
+ideal C = arcideal;
+C;
 ==> C[1]=-a3^3+a8^2
 ==> C[2]=-6*a3*a5*a7-a7^3-3*a3^2*a9+2*a6*a10+2*a8*a14
 ==> C[3]=-3*a3^2*a7+2*a6*a8
 ==> C[4]=-3*a3^2*a5-3*a3*a7^2+a6^2+2*a8*a10
 ==> C[5]=-3*a3*a5^2-3*a5*a7^2-6*a3*a7*a9-3*a3^2*a13+a10^2+2*a8*a12+2*a6*a14
 ==> C[6]=-3*a5^2*a7-6*a3*a5*a9-3*a7^2*a9-3*a3^2*a11-6*a3*a7*a13+2*a6*a12+2*a10*a14+2*a8*a16
+```
+```
 //Example 2
 ring R = 0 , (x,y), dp; 
 ideal I4 = y3 - x3, x4, x3y;
 ideal I5 = y3 - x3, x5, x4y;
 ideal I6 = y3 - x3, x6, x5y;
 list L = list (1,2);
-def a4 = arc(I4,I4,L);
-def a5 = arc(I5,I5,L);
-def a6 = arc(I6,I6,L);
-setring a4;
+def S4 = arc(I4,I4,L);
+def S5 = arc(I5,I5,L);
+def S6 = arc(I6,I6,L);
+setring S4;
 ideal A = arcideal;
 A;
-setring a5;
-ideal B = arcideal;
-B;
-setring a6;
-ideal C = arcideal;
-C;
 ==> A[1]=3*a3*a4*a7^2+3*a3^2*a7*a8
 ==> A[2]=6*a3^2*a7^2
 ==> A[3]=-3*a3^2*a7+3*a4^2*a8
 ==> A[4]=-3*a3*a7^2+3*a4*a8^2
 ==> A[5]=-3*a5*a7^2+3*a6*a8^2-6*a3*a7*a9+6*a4*a8*a10-3*a3^2*a13+3*a4^2*a14
 ==> A[6]=-a3^3+a4^3-a7^3+a8^3
+setring S5;
+ideal B = arcideal;
+B;
 ==> B[1]=6*a3^2*a4*a7^2+4*a3^3*a7*a8+a7^4*a8
 ==> B[2]=10*a3^3*a7^2+a7^5
 ==> B[3]=-a3^3+a4^3-a7^3+a8^3
@@ -63,6 +66,9 @@ C;
 ==> B[7]=-3*a3^2*a5+3*a4^2*a6-3*a7^2*a9+3*a8^2*a10-6*a3*a7*a13+6*a4*a8*a14
 ==> B[8]=-6*a3*a5*a7+6*a4*a6*a8-3*a3^2*a9+3*a4^2*a10-3*a7^2*a13+3*a8^2*a14
 ==> B[9]=-6*a5*a7*a9-3*a3*a9^2+6*a6*a8*a10+3*a4*a10^2-6*a3*a7*a11+6*a4*a8*a12-6*a3*a5*a13-3*a7*a13^2+6*a4*a6*a14+3*a8*a14^2-3*a3^2*a15+3*a4^2*a16-3*a7^2*a19+3*a8^2*a20
+setring S6;
+ideal C = arcideal;
+C;
 ==> C[1]=10*a3^3*a4*a7^2+a4*a7^5+5*a3^4*a7*a8+5*a3*a7^4*a8
 ==> C[2]=15*a3^4*a7^2+6*a3*a7^5
 ==> C[3]=-a3^3+a4^3-a7^3+a8^3
@@ -75,3 +81,4 @@ C;
 ==> C[10]=-3*a3*a5^2+3*a4*a6^2-3*a7*a9^2+3*a8*a10^2-3*a7^2*a11+3*a8^2*a12-6*a5*a7*a13-6*a3*a9*a13+6*a6*a8*a14+6*a4*a10*a14-6*a3*a7*a15+6*a4*a8*a16-3*a3^2*a19+3*a4^2*a20
 ==> C[11]=-3*a5^2*a7+3*a6^2*a8-6*a3*a5*a9+6*a4*a6*a10-3*a3^2*a11+3*a4^2*a12-6*a7*a9*a13-3*a3*a13^2+6*a8*a10*a14+3*a4*a14^2-3*a7^2*a15+3*a8^2*a16-6*a3*a7*a19+6*a4*a8*a20
 ==> C[12]=-3*a5*a9^2+3*a6*a10^2-6*a5*a7*a11-6*a3*a9*a11+6*a6*a8*a12+6*a4*a10*a12-3*a5^2*a13-3*a9*a13^2+3*a6^2*a14+3*a10*a14^2-6*a3*a5*a15-6*a7*a13*a15+6*a4*a6*a16+6*a8*a14*a16-3*a3^2*a17+3*a4^2*a18-6*a7*a9*a19-6*a3*a13*a19+6*a8*a10*a20+6*a4*a14*a20-3*a7^2*a21+3*a8^2*a22-6*a3*a7*a25+6*a4*a8*a26
+```
